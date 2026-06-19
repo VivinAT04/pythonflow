@@ -1,65 +1,35 @@
-from .task import TaskState
-from .storage import Storage
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError
 
 
 class Executor:
 
     @staticmethod
-    def execute(task, dag_name="default"):
+    def run(task):
 
-        storage = Storage()
-        attempts = 0
+        print(f"[RUNNING] {task.name}")
 
-        while attempts <= task.retries:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+
+            future = pool.submit(
+                task.func
+            )
 
             try:
-                task.state = TaskState.RUNNING
-
-                print(f"[RUNNING] {task.name}")
-
-                storage.record_task_run(
-                    dag_name,
-                    task.name,
-                    task.state,
-                    attempts
+                future.result(
+                    timeout=task.timeout
                 )
 
-                task()
-
-                task.state = TaskState.SUCCESS
-
-                print(f"[SUCCESS] {task.name}")
-
-                storage.record_task_run(
-                    dag_name,
-                    task.name,
-                    task.state,
-                    attempts
+                print(
+                    f"[SUCCESS] {task.name}"
                 )
 
-                return
+                return True
 
-            except Exception as e:
+            except TimeoutError:
 
-                attempts += 1
-                task.state = TaskState.FAILED
-
-                print(f"[FAILED] {task.name}: {e}")
-
-                storage.record_task_run(
-                    dag_name,
-                    task.name,
-                    task.state,
-                    attempts,
-                    str(e)
+                print(
+                    f"[TIMEOUT] {task.name} exceeded {task.timeout}s"
                 )
 
-                if attempts <= task.retries:
-                    print(
-                        f"[RETRY {attempts}/{task.retries}] "
-                        f"{task.name}"
-                    )
-
-        raise RuntimeError(
-            f"{task.name} failed after retries"
-        )
+                return False
