@@ -1,23 +1,18 @@
-class TaskState:
-    PENDING = "PENDING"
-    RUNNING = "RUNNING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
-
-
 class Task:
-    def __init__(self, func):
+    def __init__(
+        self,
+        func,
+        retries=0,
+        timeout=None
+    ):
         self.func = func
         self.name = func.__name__
 
+        self.retries = retries
+        self.timeout = timeout
+
         self.upstream = []
         self.downstream = []
-
-        self.state = TaskState.PENDING
-        self.retries = 3
-
-    def __call__(self):
-        return self.func()
 
     def __rshift__(self, other):
         self.downstream.append(other)
@@ -25,5 +20,20 @@ class Task:
         return other
 
 
-def task(func):
-    return Task(func)
+def task(func=None, retries=0, timeout=None):
+
+    if func is not None and callable(func):
+        return Task(
+            func,
+            retries=retries,
+            timeout=timeout
+        )
+
+    def decorator(f):
+        return Task(
+            f,
+            retries=retries,
+            timeout=timeout
+        )
+
+    return decorator
