@@ -9,7 +9,7 @@ def extract():
     print("Extracting data")
 
 
-@task
+@task(retries=3)
 def clean():
 
     global counter

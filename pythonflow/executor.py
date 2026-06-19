@@ -1,65 +1,58 @@
-from .task import TaskState
-from .storage import Storage
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError
 
 
 class Executor:
 
     @staticmethod
-    def execute(task, dag_name="default"):
+    def run(task):
 
-        storage = Storage()
         attempts = 0
 
         while attempts <= task.retries:
 
-            try:
-                task.state = TaskState.RUNNING
+            print(f"[RUNNING] {task.name}")
 
-                print(f"[RUNNING] {task.name}")
+            with ThreadPoolExecutor(max_workers=1) as pool:
 
-                storage.record_task_run(
-                    dag_name,
-                    task.name,
-                    task.state,
-                    attempts
-                )
+                future = pool.submit(task.func)
 
-                task()
-
-                task.state = TaskState.SUCCESS
-
-                print(f"[SUCCESS] {task.name}")
-
-                storage.record_task_run(
-                    dag_name,
-                    task.name,
-                    task.state,
-                    attempts
-                )
-
-                return
-
-            except Exception as e:
-
-                attempts += 1
-                task.state = TaskState.FAILED
-
-                print(f"[FAILED] {task.name}: {e}")
-
-                storage.record_task_run(
-                    dag_name,
-                    task.name,
-                    task.state,
-                    attempts,
-                    str(e)
-                )
-
-                if attempts <= task.retries:
-                    print(
-                        f"[RETRY {attempts}/{task.retries}] "
-                        f"{task.name}"
+                try:
+                    future.result(
+                        timeout=task.timeout
                     )
 
-        raise RuntimeError(
-            f"{task.name} failed after retries"
-        )
+                    print(
+                        f"[SUCCESS] {task.name}"
+                    )
+
+                    return True
+
+                except TimeoutError:
+
+                    print(
+                        f"[TIMEOUT] {task.name} exceeded {task.timeout}s"
+                    )
+
+                    return False
+
+                except Exception as e:
+
+                    attempts += 1
+
+                    print(
+                        f"[FAILED] {task.name}: {e}"
+                    )
+
+                    if attempts <= task.retries:
+
+                        print(
+                            f"[RETRY {attempts}/{task.retries}] "
+                            f"{task.name}"
+                        )
+
+                    else:
+
+                        return False
+
+        return False

@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
-from .executor import Executor
+
+from pythonflow.executor import Executor
 
 
 class ParallelExecutor:
@@ -14,11 +15,11 @@ class ParallelExecutor:
             futures = []
 
             for task in tasks:
+
                 futures.append(
                     pool.submit(
-                        Executor.execute,
-                        task,
-                        dag_name
+                        Executor.run,
+                        task
                     )
                 )
 
