@@ -1,4 +1,4 @@
-from .executor import Executor
+from .parallel_executor import ParallelExecutor
 
 
 class DAG:
@@ -15,6 +15,8 @@ class DAG:
 
         while len(executed) < len(self.tasks):
 
+            ready_tasks = []
+
             for task in self.tasks:
 
                 if task in executed:
@@ -26,7 +28,18 @@ class DAG:
                 )
 
                 if ready:
+                    ready_tasks.append(task)
 
-                    Executor.execute(task, self.name)
+            if not ready_tasks:
+                raise RuntimeError(
+                    "No executable tasks found. "
+                    "Possible DAG cycle."
+                )
 
-                    executed.add(task)
+            ParallelExecutor.execute(
+                ready_tasks,
+                self.name
+            )
+
+            for task in ready_tasks:
+                executed.add(task)
