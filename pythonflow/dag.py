@@ -27,6 +27,6 @@ class DAG:
 
                 if ready:
 
-                    Executor.execute(task)
+                    Executor.execute(task, self.name)
 
                     executed.add(task)
