@@ -2,11 +2,22 @@
 <html>
 <head>
     <title>PythonFlow Dashboard</title>
-
     <style>
         body {
             font-family: Arial;
             margin: 40px;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        img {
+            max-width: 700px;
+            width: 100%;
         }
 
         table {
@@ -29,33 +40,36 @@
 
 <h1>PythonFlow Dashboard</h1>
 
-<h2>Recent Task History</h2>
+<div class="card">
+    <h2>DAG Graph</h2>
+    <img src="{{ graph_path }}" alt="DAG Graph">
+</div>
 
-<table>
+<div class="card">
+    <h2>Recent Task History</h2>
 
-<tr>
-<th>DAG</th>
-<th>Task</th>
-<th>State</th>
-<th>Attempt</th>
-<th>Error</th>
-<th>Created</th>
-</tr>
+    <table>
+        <tr>
+            <th>DAG</th>
+            <th>Task</th>
+            <th>State</th>
+            <th>Attempt</th>
+            <th>Error</th>
+            <th>Created</th>
+        </tr>
 
-{% for row in rows %}
-
-<tr>
-<td>{{ row[0] }}</td>
-<td>{{ row[1] }}</td>
-<td>{{ row[2] }}</td>
-<td>{{ row[3] }}</td>
-<td>{{ row[4] }}</td>
-<td>{{ row[5] }}</td>
-</tr>
-
-{% endfor %}
-
-</table>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
 </body>
 </html>
