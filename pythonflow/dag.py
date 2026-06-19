@@ -1,3 +1,6 @@
+from .executor import Executor
+
+
 class DAG:
     def __init__(self, name):
         self.name = name
@@ -7,6 +10,7 @@ class DAG:
         self.tasks.extend(tasks)
 
     def run(self):
+
         executed = set()
 
         while len(executed) < len(self.tasks):
@@ -22,7 +26,7 @@ class DAG:
                 )
 
                 if ready:
-                    print(f"Running {task.name}")
-                    task()
+
+                    Executor.execute(task)
 
                     executed.add(task)

@@ -1,6 +1,9 @@
 from pythonflow import task, DAG
 
 
+counter = 0
+
+
 @task
 def extract():
     print("Extracting data")
@@ -8,6 +11,14 @@ def extract():
 
 @task
 def clean():
+
+    global counter
+
+    counter += 1
+
+    if counter < 2:
+        raise Exception("Temporary failure")
+
     print("Cleaning data")
 
 
