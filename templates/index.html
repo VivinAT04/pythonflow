@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PythonFlow Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background: #f4f4f4;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>PythonFlow Dashboard</h1>
+
+<h2>Recent Task History</h2>
+
+<table>
+
+<tr>
+<th>DAG</th>
+<th>Task</th>
+<th>State</th>
+<th>Attempt</th>
+<th>Error</th>
+<th>Created</th>
+</tr>
+
+{% for row in rows %}
+
+<tr>
+<td>{{ row[0] }}</td>
+<td>{{ row[1] }}</td>
+<td>{{ row[2] }}</td>
+<td>{{ row[3] }}</td>
+<td>{{ row[4] }}</td>
+<td>{{ row[5] }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
